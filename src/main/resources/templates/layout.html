@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGA - Sistema Integrado de Gestão Acadêmica</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="container">
+    <header class="header">
+        <h1>SIGA - Sistema Integrado de Gestão Acadêmica</h1>
+    </header>
+
+    <nav class="navigation">
+        <a th:href="@{/}">Início</a>
+        <a th:href="@{/alunos}">Alunos</a>
+        <a th:href="@{/professores}">Professores</a>
+        <a th:href="@{/presencas}">Presença</a>
+        <a th:href="@{/disciplinas}">Disciplinas</a>
+        <a th:href="@{/diario}">Diário de Turma</a>
+    </nav>
+
+    <main class="content">
+        <div th:replace="${content}"></div>
+    </main>
+
+    <footer class="footer">
+        <p>SIGA - Palmas-Tocantins 2025</p>
+        <img th:src="@{resources/static/bandeira_de_Palmas.png}" alt="Bandeira de Palmas" class="flag"/>
+    </footer>
+</div>
+
+</body>
+</html>

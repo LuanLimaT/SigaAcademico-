@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>SIGA - Sistema Integrado de Gestão Acadêmica</title>
+</head>
+
+<body>
+
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(content=~{::content})}">
+    <div th:fragment="content">
+        <h2>Bem-vindo ao SIGA</h2>
+        <p>Selecione uma das opções no menu acima para começar.</p>
+
+        <hr/>
+
+        <h3>Estatísticas do Sistema</h3>
+        <div class="stats-container">
+            <div class="stat-card">
+                <h4>Total de Alunos</h4>
+                <p th:text="${totalAlunos}">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>Total de Professores</h4>
+                <p th:text="${totalProfessores}">0</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

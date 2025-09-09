@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(content=~{::content})}">
+
+<head>
+    <title>SIGA - Registrar Diário</title>
+    <script>
+        // Função para carregar alunos com base na disciplina selecionada
+        function carregarAlunosPorDisciplina() {
+            var disciplinaId = document.getElementById("disciplina").value;
+            var alunosContainer = document.getElementById("alunos-presenca");
+            alunosContainer.innerHTML = "Carregando alunos...";
+
+            if (disciplinaId) {
+                fetch("/api/alunos/por-disciplina?disciplinaId=" + disciplinaId)
+                    .then(response => response.json())
+                    .then(alunos => {
+                        alunosContainer.innerHTML = "";
+                        if (alunos.length === 0) {
+                            alunosContainer.innerHTML = "Nenhum aluno encontrado para esta disciplina.";
+                            return;
+                        }
+                        alunos.forEach(aluno => {
+                            var div = document.createElement("div");
+                            var checkbox = document.createElement("input");
+                            checkbox.type = "checkbox";
+                            checkbox.id = "aluno_" + aluno.id;
+                            checkbox.name = "alunosPresentes";
+                            checkbox.value = aluno.id;
+                            // Pré-selecionar se for edição e o aluno estava presente
+                            if (alunosPresentesIds && alunosPresentesIds.includes(aluno.id)) {
+                                checkbox.checked = true;
+                            }
+                            var label = document.createElement("label");
+                            label.htmlFor = "aluno_" + aluno.id;
+                            label.textContent = aluno.nome;
+                            div.appendChild(checkbox);
+                            div.appendChild(label);
+                            alunosContainer.appendChild(div);
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Erro ao carregar alunos:", error);
+                        alunosContainer.innerHTML = "Erro ao carregar alunos.";
+                    });
+            } else {
+                alunosContainer.innerHTML = "Selecione uma disciplina para carregar os alunos.";
+            }
+        }
+
+        // Variável global para armazenar IDs de alunos presentes (para edição)
+        var alunosPresentesIds = [];
+        document.addEventListener("DOMContentLoaded", function() {
+            // Se for edição, preencher alunosPresentesIds
+            var presentesIdsElement = document.getElementById("presentesIds");
+            if (presentesIdsElement) {
+                alunosPresentesIds = JSON.parse(presentesIdsElement.textContent);
+            }
+            carregarAlunosPorDisciplina();
+            document.getElementById("disciplina").addEventListener("change", carregarAlunosPorDisciplina);
+        });
+    </script>
+</head>
+
+<body>
+
+<div th:fragment="content">
+    <h2 th:if="${diario.id == null}">Novo Diário de Turma</h2>
+    <h2 th:if="${diario.id != null}">Editar Diário de Turma</h2>
+
+    <form action="#" th:action="${diario.id == null} ? @{/diario/add} : @{/diario/update/{id}(id=${diario.id})}" th:object="${diario}" method="post">
+        <input type="hidden" th:field="*{id}" />
+
+        <div>
+            <label for="disciplina">Disciplina</label>
+            <select id="disciplina" name="disciplinaId" required>
+                <option value="">Selecione uma disciplina</option>
+                <option th:each="disc : ${disciplinas}" th:value="${disc.id}" th:text="${disc.nome}"
+                        th:selected="${diario.disciplina != null and diario.disciplina.id == disc.id}"></option>
+            </select>
+            <span th:if="${#fields.hasErrors('disciplina')}" th:errors="*{disciplina}"></span>
+        </div>
+
+        <div>
+            <label for="professor">Professor</label>
+            <select id="professor" name="professorId" required>
+                <option value="">Selecione um professor</option>
+                <option th:each="prof : ${professores}" th:value="${prof.id}" th:text="${prof.nome}"
+                        th:selected="${diario.professor != null and diario.professor.id == prof.id}"></option>
+            </select>
+            <span th:if="${#fields.hasErrors('professor')}" th:errors="*{professor}"></span>
+        </div>
+
+        <div>
+            <label for="data">Data</label>
+            <input type="date" id="data" th:field="*{data}" th:value="${diario.data != null ? #temporals.format(diario.data, 'yyyy-MM-dd') : #temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+            <span th:if="${#fields.hasErrors('data')}" th:errors="*{data}"></span>
+        </div>
+
+        <div>
+            <label for="conteudoAbordado">Conteúdo Abordado</label>
+            <textarea id="conteudoAbordado" th:field="*{conteudoAbordado}" rows="5"></textarea>
+            <span th:if="${#fields.hasErrors('conteudoAbordado')}" th:errors="*{conteudoAbordado}"></span>
+        </div>
+
+        <h3>Presença dos Alunos</h3>
+        <div id="alunos-presenca">
+            <!-- Alunos serão carregados aqui via JavaScript -->
+            Selecione uma disciplina para carregar os alunos.
+        </div>
+
+        <div th:if="${diario.id != null}" id="presentesIds" style="display:none;" th:text="${presentesIds}"></div>
+
+        <div>
+            <button type="submit" th:text="${diario.id == null} ? 'Salvar Diário' : 'Atualizar Diário'">Salvar Diário</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

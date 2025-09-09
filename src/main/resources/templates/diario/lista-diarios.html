@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(content=~{::content})}">
+
+<head>
+    <title>SIGA - Diário de Turma</title>
+</head>
+
+<body>
+
+<div th:fragment="content">
+    <h2>Diários de Turma</h2>
+
+    <div>
+        <a th:href="@{/diario/novo}" class="button">Novo Diário</a>
+    </div>
+
+    <br/>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Disciplina</th>
+            <th>Professor</th>
+            <th>Data</th>
+            <th>Conteúdo Abordado</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="diario : ${diarios}">
+            <td th:text="${diario.disciplina.nome}">Nome da Disciplina</td>
+            <td th:text="${diario.professor.nome}">Nome do Professor</td>
+            <td th:text="${#temporals.format(diario.data, 'dd/MM/yyyy')}">Data</td>
+            <td th:text="${diario.conteudoAbordado}">Conteúdo</td>
+            <td>
+                <a th:href="@{/diario/editar/{id}(id=${diario.id})}">Editar</a>
+                <a th:href="@{/diario/deletar/{id}(id=${diario.id})}" onclick="return confirm('Tem certeza que deseja excluir este diário? Isso removerá as presenças associadas.');">Excluir</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(diarios)}">
+            <td colspan="5">Nenhum diário registrado.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

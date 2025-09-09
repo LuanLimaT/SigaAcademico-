@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(content=~{::content})}">
+
+<head>
+    <title>SIGA - Lista de Alunos</title>
+</head>
+
+<body>
+
+<div th:fragment="content">
+    <h2>Alunos Cadastrados</h2>
+
+    <div>
+        <a th:href="@{/alunos/novo}" class="button">Novo Aluno</a>
+    </div>
+
+    <br/>
+
+    <div style="display: flex; gap: 20px;">
+        <form th:action="@{/alunos}" method="get">
+            <select name="turno" onchange="this.form.submit()">
+                <option value="">Filtrar por turno...</option>
+                <option th:each="t : ${turnos}" th:value="${t}" th:text="${t}"></option>
+            </select>
+            <a th:href="@{/alunos}" style="margin-left: 10px;">Limpar Filtro</a>
+        </form>
+
+        <form th:action="@{/alunos/pesquisar}" method="get">
+            <input type="text" name="matricula" placeholder="Pesquisar por matrícula"/>
+            <button type="submit">Pesquisar</button>
+        </form>
+    </div>
+
+    <br/>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Matrícula</th>
+            <th>Turno</th>
+            <th>E-mail</th>
+            <th>Disciplinas</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="aluno : ${alunos}">
+            <td th:text="${aluno.nome}">Nome do Aluno</td>
+            <td th:text="${aluno.matricula}">Matrícula</td>
+            <td th:text="${aluno.turno}">Turno</td>
+            <td th:text="${aluno.email}">E-mail</td>
+            <td>
+                <span th:each="disciplina, iterStat : ${aluno.disciplinas}">
+                    <span th:text="${disciplina.nome}"></span><span th:if="${!iterStat.last}">, </span>
+                </span>
+            </td>
+            <td>
+                <!-- Links para editar e excluir -->
+                <a th:href="@{/alunos/editar/{id}(id=${aluno.id})}">Editar</a>
+                <a th:href="@{/alunos/deletar/{id}(id=${aluno.id})}" onclick="return confirm('Tem certeza que deseja excluir este aluno?');">Excluir</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(alunos)}">
+            <td colspan="5">Nenhum aluno cadastrado.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
